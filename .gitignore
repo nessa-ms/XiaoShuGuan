@@ -1,0 +1,54 @@
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+
+# JavaFX Runtime
+javafx-src.zip
+*.native-package
+
+# SQLite
+*.db
+*.sqlite
+*.db-journal
+data/
+!data/schema.sql  # Schema-Datei soll getrackt werden
+
+# Application
+logs/
+*.log
+*.cfg
+*.properties
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build Output
+bin/
+dist/
+build/
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+
+# IDE
+.vscode/
+*.swp
+*.swo
+*~
