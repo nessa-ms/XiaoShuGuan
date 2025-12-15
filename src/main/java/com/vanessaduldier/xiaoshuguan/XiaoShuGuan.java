@@ -8,6 +8,13 @@ import javafx.stage.Stage;
 
 import com.vanessaduldier.xiaoshuguan.service.DatabaseManager;
 
+/*
+ * XiaoShuGuan
+ * © 2025 Vanessa Duldier
+ *
+ * Licensed under CC BY-NC 4.0
+ * Commercial use is not permitted.
+ */
 public class XiaoShuGuan extends Application {
 
     @Override
