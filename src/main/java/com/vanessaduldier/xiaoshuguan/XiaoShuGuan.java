@@ -6,10 +6,15 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
+import com.vanessaduldier.xiaoshuguan.service.DatabaseManager;
+
 public class XiaoShuGuan extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+
+        DatabaseManager.initializeDatabase();
+
         Label label = new Label("XiaoShuGuan");
         label.setStyle("-fx-font-weight: bold; -fx-padding: 20px;");
 

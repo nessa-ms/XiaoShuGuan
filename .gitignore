@@ -25,6 +25,7 @@ javafx-src.zip
 *.sqlite
 *.db-journal
 data/
+!data/
 !data/schema.sql  # Schema-Datei soll getrackt werden
 
 # Application
