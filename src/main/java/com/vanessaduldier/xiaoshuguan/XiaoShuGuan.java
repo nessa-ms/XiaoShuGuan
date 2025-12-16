@@ -1,12 +1,15 @@
 package com.vanessaduldier.xiaoshuguan;
 
+import com.vanessaduldier.xiaoshuguan.dao.BookDao;
+import com.vanessaduldier.xiaoshuguan.model.Book;
+import com.vanessaduldier.xiaoshuguan.parser.EpubParser;
+import com.vanessaduldier.xiaoshuguan.service.DatabaseService;
+
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-
-import com.vanessaduldier.xiaoshuguan.service.DatabaseManager;
 
 /*
  * XiaoShuGuan
@@ -16,11 +19,15 @@ import com.vanessaduldier.xiaoshuguan.service.DatabaseManager;
  * Commercial use is not permitted.
  */
 public class XiaoShuGuan extends Application {
+    private final EpubParser parser = new EpubParser();
+    private final BookDao bookDao = new BookDao();
 
     @Override
     public void start(Stage primaryStage) {
 
-        DatabaseManager.initializeDatabase();
+        DatabaseService.initializeDatabase();
+        // Book book = new Book(123, "Katabasis", new Author(),);
+        // DatabaseService.executeTransaction(bookDao.insert(DatabaseService.getConnection(), book));
 
         Label label = new Label("XiaoShuGuan");
         label.setStyle("-fx-font-weight: bold; -fx-padding: 20px;");

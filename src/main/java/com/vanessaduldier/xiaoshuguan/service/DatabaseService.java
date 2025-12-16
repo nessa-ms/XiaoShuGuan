@@ -9,19 +9,19 @@ import java.nio.charset.StandardCharsets;
 import java.io.InputStream;
 
 /**
- * Manage Database Connection and Transactions.
+ * Database Connection and Transaction service.
  * @author Vanessa Duldier
  */
-public class DatabaseManager {
+public class DatabaseService {
     private static final String DB_URL = "jdbc:sqlite:xiaoshuguan.db";
 
-    private DatabaseManager () {}
+    private DatabaseService() {}
 
     /**
      * Create Database based on schema.sql.
      */
     public static void initializeDatabase() {
-        try (InputStream is = DatabaseManager.class.getClassLoader().getResourceAsStream(
+        try (InputStream is = DatabaseService.class.getClassLoader().getResourceAsStream(
                 "com/vanessaduldier/xiaoshuguan/database/schema.sql");
              Connection connection = getConnection();
              Statement stmt = connection.createStatement()) {
