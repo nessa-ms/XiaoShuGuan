@@ -20,6 +20,13 @@
         <javafx.version>21.0.2</javafx.version>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>psiegman-releases</id>
+            <url>https://raw.githubusercontent.com/psiegman/mvn-repo/master/releases/</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <!-- JavaFX Modules -->
         <dependency>
@@ -38,6 +45,18 @@
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.44.1.0</version>
+        </dependency>
+
+        <!-- EPUB Parsing -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>2.0.9</version>
+        </dependency>
+        <dependency>
+            <groupId>nl.siegmann.epublib</groupId>
+            <artifactId>epublib-core</artifactId>
+            <version>3.1</version>
         </dependency>
 
         <!-- Testing -->

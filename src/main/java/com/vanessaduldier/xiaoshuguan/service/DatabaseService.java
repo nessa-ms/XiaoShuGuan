@@ -15,6 +15,10 @@ import java.io.InputStream;
 public class DatabaseService {
     private static final String DB_URL = "jdbc:sqlite:xiaoshuguan.db";
 
+    static {
+        initializeDatabase();
+    }
+
     private DatabaseService() {}
 
     /**
@@ -49,7 +53,8 @@ public class DatabaseService {
                 work.execute(connection);
                 connection.commit();  // only commit if the transaction succeeds
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                connection.rollback();
+                throw new RuntimeException("Transaction failed", e);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
