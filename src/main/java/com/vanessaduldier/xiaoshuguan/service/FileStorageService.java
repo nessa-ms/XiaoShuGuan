@@ -10,10 +10,10 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 public class FileStorageService {
-    private static final String LIBRARY_DIR = "xiaoshuguan_library";
+    private static final String LIBRARY_DIR = "src/main/resources/xiaoshuguan_library";
 
     public FileStorageService() {
-        // Library-Verzeichnis erstellen
+        // create library directory
         File libraryDir = new File(LIBRARY_DIR);
         if (!libraryDir.exists()) {
             libraryDir.mkdirs();
@@ -21,25 +21,23 @@ public class FileStorageService {
     }
 
     /**
-     * Speichert eine EPUB-Datei im Library-Ordner
+     * Save epub in xiaoshuguan_library folder
      */
     public File storeEpub(File epubFile, Book book) throws IOException {
-        // Erstelle einen sicheren Dateinamen
+
         String safeFileName = createSafeFileName(book);
         Path targetPath = Paths.get(LIBRARY_DIR, safeFileName);
 
-        // Kopiere die Datei
         Files.copy(epubFile.toPath(), targetPath, StandardCopyOption.REPLACE_EXISTING);
 
         return targetPath.toFile();
     }
 
     private String createSafeFileName(Book book) {
-        // Erstelle einen Dateinamen aus Titel und Autor
+
         String title = book.getTitle().replaceAll("[^a-zA-Z0-9äöüÄÖÜß\\s-]", "");
         String author = book.getAuthorName().replaceAll("[^a-zA-Z0-9äöüÄÖÜß\\s-]", "");
 
-        // Kürze falls zu lang
         if (title.length() > 50) {
             title = title.substring(0, 50);
         }
@@ -50,9 +48,6 @@ public class FileStorageService {
         return author + " - " + title + ".epub";
     }
 
-    /**
-     * Holt die gespeicherte EPUB-Datei
-     */
     public File getEpubFile(Book book) {
         if (book.getFilePath() == null) {
             return null;

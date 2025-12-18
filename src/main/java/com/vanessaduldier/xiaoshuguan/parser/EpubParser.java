@@ -58,8 +58,7 @@ public class EpubParser {
     }
 
     private Long generateId() {
-        // Einfache ID-Generierung, später durch DB ersetzt
-        return UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE;
+        return null;
     }
 
     private String extractTitle(nl.siegmann.epublib.domain.Book epub) {
@@ -129,7 +128,7 @@ public class EpubParser {
 
     private String extractLanguage(nl.siegmann.epublib.domain.Book epub) {
         String language = epub.getMetadata().getLanguage();
-        return language != null ? language : "de"; // Default Deutsch
+        return language != null ? language : "de";
     }
 
     private String extractCoverImage(nl.siegmann.epublib.domain.Book epub) {

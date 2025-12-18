@@ -14,7 +14,6 @@ import java.util.List;
 public class BookDao {
 
     public BookDao() {
-        // Dao wird automatisch erstellt
     }
 
     /**
@@ -87,7 +86,7 @@ public class BookDao {
     }
 
     /**
-     * Alle Bücher aus der Datenbank holen
+     * Get all Books from Database
      */
     public List<Book> findAll() {
         List<Book> books = new ArrayList<>();
@@ -102,11 +101,9 @@ public class BookDao {
                 Book book = mapResultSetToBook(rs);
                 books.add(book);
             }
-
         } catch (SQLException e) {
             throw new RuntimeException("Fehler beim Laden der Bücher", e);
         }
-
         return books;
     }
 
