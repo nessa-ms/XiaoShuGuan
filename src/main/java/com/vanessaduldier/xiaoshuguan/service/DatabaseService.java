@@ -42,10 +42,21 @@ public class DatabaseService {
         }
     }
 
+    /**
+     * @return Database Connection
+     * @throws SQLException problem with db
+     */
     public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(DB_URL);
     }
 
+    // TRANSACTIONS
+    // TODO: Javadoc und Kommentare
+
+    /**
+     *
+     * @param work TransactionWork
+     */
     public static void executeTransaction(TransactionWork work) {
         try (Connection connection = getConnection()) {
             connection.setAutoCommit(false);
@@ -61,8 +72,34 @@ public class DatabaseService {
         }
     }
 
+    /**
+     *
+     * @param work TransactionWork
+     * @return result
+     * @param <T> T
+     */
+    public static <T> T executeTransactionWithResult(TransactionWorkWithResult<T> work) {
+        try (Connection connection = getConnection()) {
+            connection.setAutoCommit(false);
+            try {
+                T result = work.execute(connection);
+                connection.commit();
+                return result;
+            } catch (Exception e) {
+                throw new RuntimeException("Transaction failed", e);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @FunctionalInterface
     public interface TransactionWork {
         void execute(Connection connection) throws Exception;
+    }
+
+    @FunctionalInterface
+    public interface TransactionWorkWithResult<T> {
+        T execute(Connection connection) throws Exception;
     }
 }

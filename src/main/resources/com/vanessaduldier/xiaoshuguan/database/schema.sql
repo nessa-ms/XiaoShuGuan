@@ -48,4 +48,5 @@ CREATE TABLE IF NOT EXISTS book_author (
     );
 
 CREATE INDEX IF NOT EXISTS idx_books_title ON books(title);
-CREATE INDEX IF NOT EXISTS idx_books_author_id ON books(author_id);
+CREATE INDEX IF NOT EXISTS idx_book_author_book ON book_author(book_id);
+CREATE INDEX IF NOT EXISTS idx_book_author_author ON book_author(author_id);
