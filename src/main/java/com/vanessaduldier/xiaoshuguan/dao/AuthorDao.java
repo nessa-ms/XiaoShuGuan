@@ -29,11 +29,12 @@ public class AuthorDao {
 
         return DatabaseService.executeTransactionWithResult(connection -> {
             String sql = "INSERT INTO author (name) VALUES (?)";
-            try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            try (PreparedStatement ps = connection.prepareStatement(sql)) {
                 ps.setString(1, author.getName());
                 ps.executeUpdate();
 
-                try (ResultSet rs = ps.getGeneratedKeys()) {
+                try (Statement stmt = connection.createStatement();
+                     ResultSet rs = stmt.executeQuery("SELECT last_insert_rowid()")) {
                     if (rs.next()) {
                         return rs.getLong(1);
                     }
@@ -67,7 +68,7 @@ public class AuthorDao {
                     return rs.getLong("id");
                 }
             }
-        } catch (RuntimeException e) {
+        } catch (SQLException e) {
             throw new RuntimeException("Fehler beim Suchen des Autors", e);
         }
         return null;

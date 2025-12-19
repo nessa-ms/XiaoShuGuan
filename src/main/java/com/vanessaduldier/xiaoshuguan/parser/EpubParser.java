@@ -97,11 +97,18 @@ public class EpubParser {
         return genres;
     }
 
+    /**
+     * Extract and clean description
+     * @param epub Epub File
+     * @return clean description
+     */
     private String extractDescription(nl.siegmann.epublib.domain.Book epub) {
         String description = epub.getMetadata().getDescriptions().isEmpty()
                 ? null
                 : epub.getMetadata().getDescriptions().get(0);
-        return description;
+        assert description != null;
+        // return description without html tags
+        return description.replaceAll("<[^>]*>", " ");
     }
 
     private String extractPublisher(nl.siegmann.epublib.domain.Book epub) {

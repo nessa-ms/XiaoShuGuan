@@ -24,57 +24,35 @@ public class BookDao {
      */
     public Long insert(Book book) {
         return DatabaseService.executeTransactionWithResult(connection -> {
-            // save authors and collect their ids
+            // save authors
             List<Long> authorIds = new ArrayList<>();
             for (Author author : book.getAuthors()) {
                 Long authorId = authorDao.insert(author);
                 authorIds.add(authorId);
             }
 
-            // save book with first author
+            // save book
             String sql = """
-                    INSERT INTO books (
-                        title, author_id, cover_image, pages, isbn, 
-                        published_date, publisher, description, file_path, 
-                        file_hash, main_genre, subgenre1, subgenre2, subgenre3,
-                        goodreads_id, goodreads_url, rating, status, notes
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    """;
+                INSERT INTO books (
+                    title, author_id, file_path, 
+                    description, publisher, isbn
+                ) VALUES (?, ?, ?, ?, ?, ?)
+                """;
 
             Long bookId;
-
-            try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            try (PreparedStatement ps = connection.prepareStatement(sql)) {
                 ps.setString(1, book.getTitle());
                 ps.setLong(2, authorIds.isEmpty() ? 1L : authorIds.get(0));
-                ps.setString(3, book.getCoverImage());
-                ps.setObject(4, book.getPageCount());
-                ps.setString(5, book.getIsbn());
-                ps.setString(6, book.getPublishedDate());
-                ps.setString(7, book.getPublisher());
-                ps.setString(8, book.getDescription());
-                ps.setString(9, book.getFilePath());
-                ps.setString(10, calculateFileHash(book.getFilePath()));
-
-                // extract genres from list
-                List<String> genres = book.getGenres();
-                ps.setString(11, !genres.isEmpty() ? genres.get(0) : null);
-                ps.setString(12, genres.size() > 1 ? genres.get(1) : null);
-                ps.setString(13, genres.size() > 2 ? genres.get(2) : null);
-                ps.setString(14, genres.size() > 3 ? genres.get(3) : null);
-
-                // Goodreads (später)
-                ps.setString(15, null);
-                ps.setString(16, null);
-
-                // User Daten
-                ps.setObject(17, null); // rating
-                ps.setString(18, "unread");
-                ps.setString(19, null); // notes
+                ps.setString(3, book.getFilePath());
+                ps.setString(4, book.getDescription());
+                ps.setString(5, book.getPublisher());
+                ps.setString(6, book.getIsbn());
 
                 ps.executeUpdate();
 
-                // Generierte ID holen
-                try (ResultSet rs = ps.getGeneratedKeys()) {
+                // Für SQLite: letzte ID abrufen
+                try (Statement stmt = connection.createStatement();
+                     ResultSet rs = stmt.executeQuery("SELECT last_insert_rowid()")) {
                     if (rs.next()) {
                         bookId = rs.getLong(1);
                     } else {
@@ -83,24 +61,20 @@ public class BookDao {
                 }
             }
 
-            // save many to many relations in book_author
-            String bookAuthorSql = "INSERT INTO book_author (book_id, author_id) VALUES (?, ?)";
-            try (PreparedStatement ps = connection.prepareStatement(bookAuthorSql)) {
-                for (Long authorId : authorIds) {
-                    ps.setLong(1, bookId);
-                    ps.setLong(2, authorId);
-                    ps.addBatch();
+            // save many to many relations
+            if (!authorIds.isEmpty()) {
+                String bookAuthorSql = "INSERT INTO book_author (book_id, author_id) VALUES (?, ?)";
+                try (PreparedStatement ps = connection.prepareStatement(bookAuthorSql)) {
+                    for (Long authorId : authorIds) {
+                        ps.setLong(1, bookId);
+                        ps.setLong(2, authorId);
+                        ps.addBatch();
+                    }
+                    ps.executeBatch();
                 }
-                ps.executeBatch();
             }
             return bookId;
         });
-    }
-
-    private String calculateFileHash(String filePath) {
-        // Einfache Hash-Berechnung
-        // TODO: Implementieren (z.B. MD5 oder SHA-256)
-        return "hash_" + filePath.hashCode();
     }
 
     /**
@@ -126,14 +100,20 @@ public class BookDao {
     }
 
     private Book mapResultSetToBook(ResultSet rs) throws SQLException {
-        // TODO: Vollständige Mapping-Logik implementieren
+        Long bookId = rs.getLong("id");
+
+        // Autoren laden
+        List<Author> authors = loadAuthors(bookId);
+
+        // Buch mit Basisinformationen erstellen (keine Genres im neuen Schema)
         Book book = new Book(
-                rs.getLong("id"),
+                bookId,
                 rs.getString("title"),
-                new ArrayList<>(), // Authors müssten separat geladen werden
-                extractGenresFromResultSet(rs)
+                authors,
+                new ArrayList<>() // Keine Genres in vereinfachtem Schema
         );
 
+        // Verfügbare Metadaten setzen
         book.setDescription(rs.getString("description"));
         book.setPublisher(rs.getString("publisher"));
         book.setIsbn(rs.getString("isbn"));
@@ -151,8 +131,6 @@ public class BookDao {
         return genres;
     }
 
-
-
     public Long findBookId(String title) {
         return null;
     }
@@ -165,7 +143,7 @@ public class BookDao {
         List<Author> authors = new ArrayList<>();
         String sql = """
                 SELECT a.* FROM author a
-                JOIN book_author ba ON a.id = ba.book_id
+                JOIN book_author ba ON a.id = ba.author_id
                 WHERE ba.book_id = ?
                 """;
 

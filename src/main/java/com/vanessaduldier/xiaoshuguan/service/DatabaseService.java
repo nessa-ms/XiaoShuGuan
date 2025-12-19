@@ -1,12 +1,9 @@
 package com.vanessaduldier.xiaoshuguan.service;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.nio.charset.StandardCharsets;
-import java.io.InputStream;
 
 /**
  * Database Connection and Transaction service.
@@ -22,23 +19,48 @@ public class DatabaseService {
     private DatabaseService() {}
 
     /**
-     * Create Database based on schema.sql.
+     * Create Database
      */
     public static void initializeDatabase() {
-        try (InputStream is = DatabaseService.class.getClassLoader().getResourceAsStream(
-                "com/vanessaduldier/xiaoshuguan/database/schema.sql");
-             Connection connection = getConnection();
+        try (Connection connection = getConnection();
              Statement stmt = connection.createStatement()) {
 
-            if (is == null) {
-                throw new RuntimeException("schema.sql not found");
-            }
+            // Tabellen erstellen
+            String sql = """
+            CREATE TABLE IF NOT EXISTS author (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL UNIQUE
+            );
 
-            String sql = new String(is.readAllBytes(), StandardCharsets.UTF_8);
-            stmt.execute(sql);
+            CREATE TABLE IF NOT EXISTS books (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                author_id INTEGER,
+                file_path TEXT UNIQUE NOT NULL,
+                description TEXT,
+                publisher TEXT,
+                isbn TEXT,
+                added_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (author_id) REFERENCES author(id)
+            );
 
-        } catch (SQLException | IOException ex) {
-            throw new RuntimeException(ex);
+            CREATE TABLE IF NOT EXISTS book_author (
+                book_id INTEGER,
+                author_id INTEGER,
+                PRIMARY KEY (book_id, author_id),
+                FOREIGN KEY (book_id) REFERENCES books(id),
+                FOREIGN KEY (author_id) REFERENCES author(id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_books_title ON books(title);
+            CREATE INDEX IF NOT EXISTS idx_book_author_book ON book_author(book_id);
+            CREATE INDEX IF NOT EXISTS idx_book_author_author ON book_author(author_id);
+            """;
+
+            stmt.executeUpdate(sql);
+
+        } catch (SQLException ex) {
+            throw new RuntimeException("Fehler beim Initialisieren der Datenbank", ex);
         }
     }
 
@@ -86,10 +108,11 @@ public class DatabaseService {
                 connection.commit();
                 return result;
             } catch (Exception e) {
+                connection.rollback();
                 throw new RuntimeException("Transaction failed", e);
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Database connection failed", e);
         }
     }
 

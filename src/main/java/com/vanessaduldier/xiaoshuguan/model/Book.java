@@ -12,7 +12,6 @@ public class Book {
     private List<Author> authors;
     private List<String> genres;
 
-    // Neue Felder für zusätzliche Metadaten
     private String description;
     private String publisher;
     private String isbn;
