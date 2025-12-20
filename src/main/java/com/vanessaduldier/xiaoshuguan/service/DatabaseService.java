@@ -20,6 +20,7 @@ public class DatabaseService {
 
     /**
      * Create Database
+     * contains schema of database
      */
     public static void initializeDatabase() {
         try (Connection connection = getConnection();
@@ -66,7 +67,7 @@ public class DatabaseService {
 
     /**
      * @return Database Connection
-     * @throws SQLException problem with db
+     * @throws SQLException problem with database
      */
     public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(DB_URL);
@@ -74,25 +75,6 @@ public class DatabaseService {
 
     // TRANSACTIONS
     // TODO: Javadoc und Kommentare
-
-    /**
-     *
-     * @param work TransactionWork
-     */
-    public static void executeTransaction(TransactionWork work) {
-        try (Connection connection = getConnection()) {
-            connection.setAutoCommit(false);
-            try {
-                work.execute(connection);
-                connection.commit();  // only commit if the transaction succeeds
-            } catch (Exception e) {
-                connection.rollback();
-                throw new RuntimeException("Transaction failed", e);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     /**
      *
@@ -114,11 +96,6 @@ public class DatabaseService {
         } catch (SQLException e) {
             throw new RuntimeException("Database connection failed", e);
         }
-    }
-
-    @FunctionalInterface
-    public interface TransactionWork {
-        void execute(Connection connection) throws Exception;
     }
 
     @FunctionalInterface

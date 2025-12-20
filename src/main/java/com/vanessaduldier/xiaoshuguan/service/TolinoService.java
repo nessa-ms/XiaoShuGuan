@@ -6,6 +6,7 @@ import java.io.File;
 
 /**
  * Use XiaoShuGuan to load books into your kobo/tolino via usb connection
+ * @author Vanessa Duldier
  */
 public class TolinoService {
     private final String pathToEreader;

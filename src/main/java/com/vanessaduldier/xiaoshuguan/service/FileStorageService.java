@@ -9,6 +9,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
+/**
+ * Save Epub files in xiaoshuguan_library folder
+ * @author Vanessa Duldier
+ */
 public class FileStorageService {
     private static final String LIBRARY_DIR = "src/main/resources/xiaoshuguan_library";
 

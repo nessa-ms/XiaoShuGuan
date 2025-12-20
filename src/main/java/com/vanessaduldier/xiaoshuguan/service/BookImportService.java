@@ -5,13 +5,11 @@ import com.vanessaduldier.xiaoshuguan.model.Book;
 import com.vanessaduldier.xiaoshuguan.parser.EpubParser;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 
 /**
  * Import Epub into App
+ * uses EpubParser, FileStorageSrvice and BookDao
+ * @author Vanessa Duldier
  */
 public class BookImportService {
     private final EpubParser epubParser;
@@ -31,15 +29,15 @@ public class BookImportService {
         try {
             System.out.println("Importiere: " + epubFile.getName());
 
-            // 1. EPUB parsen
+            // parse epub
             Book book = epubParser.parse(epubFile);
             System.out.println("Geparst: " + book.getTitle());
 
-            // 2. Datei in Library-Ordner kopieren
+            // copy epub to library folder
             File storedFile = fileStorageService.storeEpub(epubFile, book);
             book.setFilePath(storedFile.getAbsolutePath());
 
-            // 3. In Datenbank speichern
+            // save to database
             Long bookId = bookDao.insert(book);
             book.setId(bookId);
 
