@@ -11,6 +11,7 @@ public class Book {
     private String title;
     private List<Author> authors;
     private List<String> genres;
+    private String goodreadsLink;
 
     private String description;
     private String publisher;
@@ -89,6 +90,17 @@ public class Book {
 
     public void setIsbn(String isbn) {
         this.isbn = isbn;
+    }
+
+    public String getGoodreadsLink() {
+        if (goodreadsLink == null || goodreadsLink.isEmpty()) {
+            return goodreadsLink;
+        }
+        return "no link has been added";
+    }
+
+    public void setGoodreadsLink(String goodreadsLink) {
+        this.goodreadsLink = goodreadsLink;
     }
 
     public String getLanguage() {
