@@ -42,7 +42,7 @@ public class BookDetailsDialog extends Dialog<Void> {
         ButtonType cancelButton = new ButtonType("Abbrechen", ButtonBar.ButtonData.CANCEL_CLOSE);
         ButtonType linkButton = new ButtonType("Add Goodreads Link", ButtonBar.ButtonData.OTHER);
 
-        getDialogPane().getButtonTypes().addAll(saveButton, cancelButton);
+        getDialogPane().getButtonTypes().addAll(saveButton, cancelButton, linkButton);
         getDialogPane().setContent(grid);
 
         Button addLinkButton = (Button) getDialogPane().lookupButton(linkButton);
@@ -71,7 +71,6 @@ public class BookDetailsDialog extends Dialog<Void> {
             if (dialogButton == saveButton) {
                 // Update the book with new values
                 book.setTitle(titleField.getText());
-                // Note: You would need more logic to properly update authors and genres
                 System.out.println("Book saved with new title: " + book.getTitle());
             }
             return null;
