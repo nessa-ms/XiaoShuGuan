@@ -9,8 +9,11 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -39,6 +42,13 @@ public class XiaoShuGuan extends Application {
         importService = new BookImportService();
         bookDao = new BookDao();
 
+        // Load Icon
+        primaryStage.getIcons().add(
+                new Image(
+                        getClass().getResourceAsStream("/ui/icon/icon.png")
+                )
+        );
+
         // build GUI
         BorderPane mainPane = new BorderPane();
         mainPane.setPadding(new Insets(10));
@@ -46,28 +56,17 @@ public class XiaoShuGuan extends Application {
         // TOP BOX title and search field
         VBox topBox = new VBox(10);
 
-        Label titleLabel = new Label("XiaoShuGuan - Personal Library");
-        titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
-
         // search field
         HBox searchBox = new HBox(10);
         searchField = new TextField();
         searchField.setPromptText("Suche nach Titel, Autor oder Genre...");
         searchField.textProperty().addListener((obs, oldVal, newVal) -> searchBooks());
 
-        Button clearButton = new Button("clear");
-        clearButton.setOnAction(e -> {
-            searchField.clear();
-            refreshBooks();
-        });
-
         searchBox.getChildren().addAll(
-                new Label("Suche:"),
-                searchField,
-                clearButton
+                searchField
         );
 
-        topBox.getChildren().addAll(titleLabel, searchBox);
+        topBox.getChildren().addAll(searchBox);
         mainPane.setTop(topBox);
 
         // CENTRE table
@@ -92,9 +91,24 @@ public class XiaoShuGuan extends Application {
         bottomBox.getChildren().addAll(buttonBox, statusLabel);
         mainPane.setBottom(bottomBox);
 
+        topBox.setPadding(new Insets(20));
+        searchBox.setPadding(new Insets(10));
+        buttonBox.setPadding(new Insets(10));
+
+        bookTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        bookTable.setFixedCellSize(22);
+
+        Rectangle clip = new Rectangle();
+        clip.widthProperty().bind(bookTable.widthProperty());
+        clip.heightProperty().bind(bookTable.heightProperty());
+        clip.setArcWidth(28);
+        clip.setArcHeight(28);
+        bookTable.setClip(clip);
+
 
         // window setup
         Scene scene = new Scene(mainPane, 900, 600);
+        scene.getStylesheets().add(getClass().getResource("/styles/cherry-blossom.css").toExternalForm());
         primaryStage.setTitle("XiaoShuGuan");
         primaryStage.setScene(scene);
         primaryStage.show();
