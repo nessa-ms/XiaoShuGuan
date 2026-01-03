@@ -21,7 +21,23 @@ https://mvnrepository.com/artifact/nl.siegmann.epublib/epublib-core/3.1
 ### Test
 
 ### Project Progress
-Currently tracking goals (with "not yet implemented") and progress of this project under the description tag.
+TODO
+Functional
+- implement read status (+ filter)
+- implement personal notes for book
+- make description of book visible again in book dialog
+- implement delete book
+
+- fix changeing book info manually (actually save it)
+- implement adding a book manually (typing info and how to deal with epub not being available)
+
+- implement changeging book cover (for export to ereader)
+- implement export to ereader
+
+Aesthetics
+- add icon to all windows
+- add stylesheet to all windows
+- Add custom cursor
 
 ### Author
 vanessaduldier@gmx.de
