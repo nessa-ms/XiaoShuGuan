@@ -4,6 +4,7 @@ import com.vanessaduldier.xiaoshuguan.dao.BookDao;
 import com.vanessaduldier.xiaoshuguan.model.Book;
 import com.vanessaduldier.xiaoshuguan.service.BookImportService;
 
+import com.vanessaduldier.xiaoshuguan.ui.BookDetailsDialog;
 import javafx.application.Application;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
@@ -13,7 +14,6 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -54,12 +54,12 @@ public class XiaoShuGuan extends Application {
         mainPane.setPadding(new Insets(10));
 
         // TOP BOX title and search field
-        VBox topBox = new VBox(10);
+        VBox topBox = new VBox(5);
 
         // search field
-        HBox searchBox = new HBox(10);
+        HBox searchBox = new HBox(5);
         searchField = new TextField();
-        searchField.setPromptText("Suche nach Titel, Autor oder Genre...");
+        searchField.setPromptText("Search Title, Author or Genre...");
         searchField.textProperty().addListener((obs, oldVal, newVal) -> searchBooks());
 
         searchBox.getChildren().addAll(
@@ -216,19 +216,9 @@ public class XiaoShuGuan extends Application {
     }
 
     private void showBookDetails(Book book) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Buchdetails");
-        alert.setHeaderText(book.getTitle());
-
-        String content = "Autor: " + book.getAuthorName() + "\n" +
-                "Genres: " + String.join(", ", book.getGenres()) + "\n" +
-                (book.getIsbn() != null ? "ISBN: " + book.getIsbn() + "\n" : "") +
-                (book.getPublisher() != null ? "Verlag: " + book.getPublisher() + "\n" : "") +
-                (book.getDescription() != null && !book.getDescription().isEmpty() ?
-                        "\nBeschreibung:\n" + book.getDescription() : "");
-
-        alert.setContentText(content);
-        alert.showAndWait();
+        BookDetailsDialog dialog = new BookDetailsDialog(book);
+        dialog.showAndWait();
+        refreshBooks();
     }
 
     public static void main(String[] args) {

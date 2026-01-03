@@ -106,7 +106,9 @@ public class EpubParser {
         String description = epub.getMetadata().getDescriptions().isEmpty()
                 ? null
                 : epub.getMetadata().getDescriptions().get(0);
-        assert description != null;
+        if (description == null || description.isEmpty()) {
+            return "No description available";
+        }
         // return description without html tags
         return description.replaceAll("<[^>]*>", " ");
     }

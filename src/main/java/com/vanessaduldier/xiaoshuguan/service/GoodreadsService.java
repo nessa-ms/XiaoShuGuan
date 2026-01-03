@@ -7,6 +7,13 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Get additional Metadata about Books from Goodreads
@@ -15,6 +22,30 @@ public class GoodreadsService {
 
     public GoodreadsService() {
 
+    }
+
+    public List<String> fetchGenres(String goodreadsUrl) throws IOException {
+        Document doc = Jsoup.connect(goodreadsUrl)
+                .userAgent("Mozilla/5.0") // sehr wichtig!
+                .timeout(10_000)
+                .get();
+
+        List<String> genres = new ArrayList<>();
+
+        // Selektor für die Genre-Buttons
+        Elements genreElements = doc.select(
+                "div[data-testid=genresList] a.Button--tag span.Button__labelItem"
+        );
+
+        for (Element el : genreElements) {
+            String genre = el.text();
+            if (!genres.contains(genre)) {
+                genres.add(genre);
+            }
+            if (genres.size() == 4) break; // max 4 Genres
+        }
+
+        return genres;
     }
 
     /**

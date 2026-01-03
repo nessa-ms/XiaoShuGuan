@@ -1,18 +1,31 @@
 package com.vanessaduldier.xiaoshuguan.ui;
 
+import com.vanessaduldier.xiaoshuguan.dao.BookDao;
 import com.vanessaduldier.xiaoshuguan.model.Author;
 import com.vanessaduldier.xiaoshuguan.model.Book;
+import com.vanessaduldier.xiaoshuguan.service.GoodreadsService;
+import javafx.concurrent.Task;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class BookDetailsDialog extends Dialog<Void> {
+    private final GoodreadsService goodreadsService = new GoodreadsService();
+    private final BookDao bookDao = new BookDao();
 
     public BookDetailsDialog(Book book) {
+        Book original = book.copy();
+
+        // add stylesheet
+        getDialogPane().getStylesheets().add(
+                getClass().getResource("/styles/cherry-blossom.css").toExternalForm()
+        );
+
         setTitle("Buchdetails: " + book.getTitle());
-        setHeaderText("Details anzeigen und bearbeiten");
 
         // Content
         GridPane grid = new GridPane();
@@ -40,13 +53,16 @@ public class BookDetailsDialog extends Dialog<Void> {
         // Buttons
         ButtonType saveButton = new ButtonType("Speichern", ButtonBar.ButtonData.OK_DONE);
         ButtonType cancelButton = new ButtonType("Abbrechen", ButtonBar.ButtonData.CANCEL_CLOSE);
-        ButtonType linkButton = new ButtonType("Add Goodreads Link", ButtonBar.ButtonData.OTHER);
 
-        getDialogPane().getButtonTypes().addAll(saveButton, cancelButton, linkButton);
+        getDialogPane().getButtonTypes().addAll(saveButton, cancelButton);
+
+        Button linkButton = new Button("Add Goodreads Link");
+        grid.add(linkButton, 1, 3);
+
         getDialogPane().setContent(grid);
 
-        Button addLinkButton = (Button) getDialogPane().lookupButton(linkButton);
-        addLinkButton.setOnAction(e -> {
+
+        linkButton.setOnAction(e -> {
             TextInputDialog linkDialog = new TextInputDialog("");
             linkDialog.setTitle("Enter Goodreads Link to Book");
             linkDialog.setHeaderText("Goodreads Link");
@@ -54,24 +70,58 @@ public class BookDetailsDialog extends Dialog<Void> {
 
             Optional<String> result = linkDialog.showAndWait();
             result.ifPresent(link -> {
-                book.setGoodreadsLink(link);  // save link to book
-                System.out.println("Goodreads link added: " + link);
+                book.setGoodreadsLink(link);
 
-                // Show confirmation
-                Alert confirmation = new Alert(Alert.AlertType.INFORMATION);
-                confirmation.setTitle("Link Added");
-                confirmation.setHeaderText(null);
-                confirmation.setContentText("Goodreads link has been added: " + link);
-                confirmation.showAndWait();
+                ProgressIndicator progress = new ProgressIndicator();
+                grid.add(progress, 1, 3);
+
+                Task<List<String>> loadGenresTask = new Task<>() {
+                    @Override
+                    protected List<String> call() throws Exception {
+                        return goodreadsService.fetchGenres(link);
+                    }
+                };
+
+                loadGenresTask.setOnSucceeded(ev -> {
+                    List<String> genres = loadGenresTask.getValue();
+                    book.setGenres(genres);
+
+                    // UI aktualisieren
+                    genresField.setText(String.join(", ", genres));
+                    grid.getChildren().remove(progress);
+
+                    Alert confirmation = new Alert(Alert.AlertType.INFORMATION);
+                    confirmation.setTitle("Genres geladen");
+                    confirmation.setHeaderText(null);
+                    confirmation.setContentText(
+                            "Genres von Goodreads übernommen:\n" +
+                                    String.join(", ", genres)
+                    );
+                    confirmation.showAndWait();
+                });
+
+                loadGenresTask.setOnFailed(ev -> {
+                    grid.getChildren().remove(progress);
+
+                    Alert error = new Alert(Alert.AlertType.ERROR);
+                    error.setTitle("Fehler");
+                    error.setHeaderText("Goodreads konnte nicht geladen werden");
+                    error.setContentText(loadGenresTask.getException().getMessage());
+                    error.showAndWait();
+                });
+
+                new Thread(loadGenresTask).start();
             });
         });
 
         // Set result converter to handle save button
         setResultConverter(dialogButton -> {
             if (dialogButton == saveButton) {
-                // Update the book with new values
                 book.setTitle(titleField.getText());
-                System.out.println("Book saved with new title: " + book.getTitle());
+                bookDao.update(book);
+            } else {
+                // X (cancel)
+                book.restore(original);
             }
             return null;
         });

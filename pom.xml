@@ -24,10 +24,22 @@
         <repository>
             <id>psiegman-releases</id>
             <url>https://raw.githubusercontent.com/psiegman/mvn-repo/master/releases/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
     </repositories>
 
     <dependencies>
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.17.1</version>
+        </dependency>
+
         <!-- JavaFX Modules -->
         <dependency>
             <groupId>org.openjfx</groupId>

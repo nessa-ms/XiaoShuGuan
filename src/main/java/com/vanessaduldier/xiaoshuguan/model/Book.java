@@ -3,6 +3,7 @@ package com.vanessaduldier.xiaoshuguan.model;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
  * @author Vanessa Duldier
  */
@@ -27,6 +28,55 @@ public class Book {
         this.title = title;
         this.authors = authors != null ? authors : new ArrayList<>();
         this.genres = genres != null ? genres : new ArrayList<>();
+    }
+
+    /**
+     * Backup Book State
+     * @return backup
+     */
+    public Book copy() {
+        Book copy = new Book(
+                this.id,
+                this.title,
+                new ArrayList<>(this.authors),
+                new ArrayList<>(this.genres)
+        );
+
+        copy.setGoodreadsLink(this.goodreadsLink);
+        copy.setDescription(this.description);
+        copy.setPublisher(this.publisher);
+        copy.setIsbn(this.isbn);
+        copy.setLanguage(this.language);
+        copy.setCoverImage(this.coverImage);
+        copy.setFilePath(this.filePath);
+        copy.setPageCount(this.pageCount);
+        copy.setPublishedDate(this.publishedDate);
+
+        return copy;
+    }
+
+    /**
+     * Restore original book from copy (backup)
+     * @param original previous copy of book
+     */
+    public void restore(Book original) {
+        this.title = original.title;
+
+        this.authors.clear();
+        this.authors.addAll(original.authors);
+
+        this.genres.clear();
+        this.genres.addAll(original.genres);
+
+        this.goodreadsLink = original.goodreadsLink;
+        this.description = original.description;
+        this.publisher = original.publisher;
+        this.isbn = original.isbn;
+        this.language = original.language;
+        this.coverImage = original.coverImage;
+        this.filePath = original.filePath;
+        this.pageCount = original.pageCount;
+        this.publishedDate = original.publishedDate;
     }
 
     public Long getId() {
@@ -69,11 +119,17 @@ public class Book {
     }
 
     public String getDescription() {
-        return description;
+        if (description == null || description.isEmpty()) {
+            return "No description available"; // default value to avoid NullPointerException
+        }
+        return description.replaceAll("\\s+", " ").trim();
     }
 
     public void setDescription(String description) {
-        this.description = description;
+        if (description == null || description.isEmpty()) {
+            this.description = "No description available"; // default value to avoid NullPointerException
+        }
+        this.description = description.replaceAll("\\s+", " ").trim();
     }
 
     public String getPublisher() {

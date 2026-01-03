@@ -44,6 +44,11 @@ public class DatabaseService {
                 added_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (author_id) REFERENCES author(id)
             );
+            
+            CREATE TABLE IF NOT EXISTS genre (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT UNIQUE NOT NULL
+            );
 
             CREATE TABLE IF NOT EXISTS book_author (
                 book_id INTEGER,
@@ -51,6 +56,12 @@ public class DatabaseService {
                 PRIMARY KEY (book_id, author_id),
                 FOREIGN KEY (book_id) REFERENCES books(id),
                 FOREIGN KEY (author_id) REFERENCES author(id)
+            );
+            
+            CREATE TABLE IF NOT EXISTS book_genre (
+                book_id INTEGER,
+                genre_id INTEGER,
+                PRIMARY KEY (book_id, genre_id)
             );
 
             CREATE INDEX IF NOT EXISTS idx_books_title ON books(title);
@@ -96,6 +107,30 @@ public class DatabaseService {
         } catch (SQLException e) {
             throw new RuntimeException("Database connection failed", e);
         }
+    }
+
+    /**
+     * for updates
+     * @param work TransactionWork
+     */
+    public static void executeTransaction(TransactionWork work) {
+        try (Connection connection = getConnection()) {
+            connection.setAutoCommit(false);
+            try {
+                work.execute(connection);
+                connection.commit();
+            } catch (Exception e) {
+                connection.rollback();
+                throw new RuntimeException("Transaction failed", e);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Database connection failed", e);
+        }
+    }
+
+    @FunctionalInterface
+    public interface TransactionWork {
+        void execute(Connection connection) throws Exception;
     }
 
     @FunctionalInterface

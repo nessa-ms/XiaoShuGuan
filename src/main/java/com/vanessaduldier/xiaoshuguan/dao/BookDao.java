@@ -14,6 +14,7 @@ import java.util.List;
  */
 public class BookDao {
     private final AuthorDao authorDao = new AuthorDao();
+    private final GenreDao genreDao = new GenreDao();
 
     public BookDao() {
 
@@ -99,6 +100,66 @@ public class BookDao {
         return books;
     }
 
+    /**
+     * Update an existing Book in the Database
+     */
+    public void update(Book book) {
+        DatabaseService.executeTransaction(connection -> {
+            // 1. Update main book fields
+            String sql = """
+            UPDATE books SET
+                title = ?,
+                file_path = ?,
+                description = ?,
+                publisher = ?,
+                isbn = ?
+            WHERE id = ?
+        """;
+
+            try (PreparedStatement ps = connection.prepareStatement(sql)) {
+                ps.setString(1, book.getTitle());
+                ps.setString(2, book.getFilePath());
+                ps.setString(3, book.getDescription());
+                ps.setString(4, book.getPublisher());
+                ps.setString(5, book.getIsbn());
+                ps.setLong(6, book.getId());
+
+                ps.executeUpdate();
+            }
+
+            // 2. Update authors relation
+            // First, delete old relations
+            String deleteSql = "DELETE FROM book_author WHERE book_id = ?";
+            try (PreparedStatement ps = connection.prepareStatement(deleteSql)) {
+                ps.setLong(1, book.getId());
+                ps.executeUpdate();
+            }
+
+            // Then insert updated authors (create new authors if needed)
+            List<Long> authorIds = new ArrayList<>();
+            for (Author author : book.getAuthors()) {
+                Long authorId = author.getId() != null ? author.getId() : authorDao.insert(author);
+                authorIds.add(authorId);
+            }
+
+            if (!authorIds.isEmpty()) {
+                String insertSql = "INSERT INTO book_author (book_id, author_id) VALUES (?, ?)";
+                try (PreparedStatement ps = connection.prepareStatement(insertSql)) {
+                    for (Long authorId : authorIds) {
+                        ps.setLong(1, book.getId());
+                        ps.setLong(2, authorId);
+                        ps.addBatch();
+                    }
+                    ps.executeBatch();
+                }
+            }
+
+            // 3. Optionally: update genres via GenreDao if your schema allows it
+            genreDao.updateBookGenres(book, connection); // optional
+        });
+    }
+
+
     private Book mapResultSetToBook(ResultSet rs) throws SQLException {
         Long bookId = rs.getLong("id");
 
@@ -118,6 +179,10 @@ public class BookDao {
         book.setPublisher(rs.getString("publisher"));
         book.setIsbn(rs.getString("isbn"));
         book.setFilePath(rs.getString("file_path"));
+
+        // genres mit GoodreadsService und GenreDao
+        List<String> genres = genreDao.findGenresForBook(bookId);
+        book.setGenres(genres);
 
         return book;
     }
