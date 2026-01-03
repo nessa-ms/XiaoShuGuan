@@ -10,6 +10,10 @@ Filter your books by various categories such as author, genre and (not yet imple
 Sort your books by various categories such as title, author, genre etc. (not yet implemented) <br>
 Use XiaoShuGuan to load books into your kobo or tolino ereader via USB connection. (not yet implemented) <br>
 
+### Preview
+![alt text](preview/Screenshot%202026-01-03%20132606.png)
+![alt text](preview/Screenshot%202026-01-03%20132708.png)
+
 ### Installation
 
 ### Dependencies
