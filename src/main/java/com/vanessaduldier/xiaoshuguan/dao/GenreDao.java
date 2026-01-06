@@ -11,7 +11,6 @@ public class GenreDao {
 
     public void saveGenresForBook(Long bookId, List<String> genres) {
         if (bookId == null || genres == null || genres.isEmpty()) return;
-
         DatabaseService.executeTransactionWithResult(connection -> {
 
             String insertGenre =

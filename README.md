@@ -11,8 +11,10 @@ Sort your books by various categories such as title, author, genre etc. (not yet
 Use XiaoShuGuan to load books into your kobo or tolino ereader via USB connection. (not yet implemented) <br>
 
 ### Preview
-![alt text](preview/Screenshot%202026-01-03%20132606.png)
-![alt text](preview/Screenshot%202026-01-03%20132708.png)
+![alt text](preview/Screenshot%202026-01-06%20193239.png)
+![alt text](preview/Screenshot%202026-01-06%20193301.png)
+![alt text](preview/Screenshot%202026-01-06%20193307.png)
+![alt text](preview/Screenshot%202026-01-06%20193333.png)
 
 ### Installation
 
@@ -29,18 +31,15 @@ TODO
 Functional
 - implement read status (+ filter)
 - implement personal notes for book
-- make description of book visible again in book dialog
 - implement delete book
 
-- fix changeing book info manually (actually save it)
 - implement adding a book manually (typing info and how to deal with epub not being available)
 
 - implement changeging book cover (for export to ereader)
 - implement export to ereader
 
 Aesthetics
-- add icon to all windows
-- add stylesheet to all windows
+- change javafx default ! and ? icons of popup windows
 - Add custom cursor
 
 ### Author

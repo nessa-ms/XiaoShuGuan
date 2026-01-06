@@ -4,6 +4,7 @@ import com.vanessaduldier.xiaoshuguan.model.Author;
 import com.vanessaduldier.xiaoshuguan.service.DatabaseService;
 
 import java.sql.*;
+import java.util.List;
 
 /**
  * Data access object author
@@ -18,38 +19,30 @@ public class AuthorDao {
     /**
      * Insert author into database
      * If author already in database, return id, else add author to database
-     * @param author Author
+     * @param connection Connection to database
+     * @param author Authors
      * @return existingId Long if author already in database, else null
      */
-    public Long insert(Author author) {
-        Long existingId = findAuthorId(author.getName());
-        if (existingId != null) {
-            return existingId;
+    public Long insert(Connection connection, Author author) throws SQLException {
+
+        String insertSql = "INSERT OR IGNORE INTO author(name) VALUES (?)";
+        try (PreparedStatement ps = connection.prepareStatement(insertSql)) {
+            ps.setString(1, author.getName());
+            ps.executeUpdate();
         }
 
-        return DatabaseService.executeTransactionWithResult(connection -> {
-            String sql = "INSERT INTO author (name) VALUES (?)";
-            try (PreparedStatement ps = connection.prepareStatement(sql)) {
-                ps.setString(1, author.getName());
-                ps.executeUpdate();
-
-                try (Statement stmt = connection.createStatement();
-                     ResultSet rs = stmt.executeQuery("SELECT last_insert_rowid()")) {
-                    if (rs.next()) {
-                        return rs.getLong(1);
-                    }
-                }
+        String selectSql = "SELECT id FROM author WHERE name = ?";
+        try (PreparedStatement ps = connection.prepareStatement(selectSql)) {
+            ps.setString(1, author.getName());
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                Long id = rs.getLong("id");
+                author.setId(id);
+                return id;
             }
-            return null;
-        });
-    }
+        }
 
-    public void delete(Author author) {
-
-    }
-
-    public void update(Author author) {
-
+        throw new SQLException("Author ID konnte nicht ermittelt werden: " + author.getName());
     }
 
     /**
@@ -81,22 +74,15 @@ public class AuthorDao {
      */
     public Author findAuthor(Long id) {
         String sql = "SELECT * FROM author WHERE id = ?";
-
-        try (Connection connection = DatabaseService.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-
+        try (Connection conn = DatabaseService.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, id);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return new Author(
-                            rs.getLong("id"),
-                            rs.getString("name")
-                    );
-                }
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return new Author(rs.getLong("id"), rs.getString("name"));
             }
-
         } catch (SQLException e) {
-            throw new RuntimeException("Fehler beim Laden des Authors", e);
+            throw new RuntimeException(e);
         }
         return null;
     }

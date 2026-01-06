@@ -48,6 +48,7 @@ public class XiaoShuGuan extends Application {
                         getClass().getResourceAsStream("/ui/icon/icon.png")
                 )
         );
+        Image icon = new Image(getClass().getResourceAsStream("/ui/icon/icon.png"));
 
         // build GUI
         BorderPane mainPane = new BorderPane();

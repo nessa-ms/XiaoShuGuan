@@ -28,7 +28,7 @@ public class BookDao {
             // save authors
             List<Long> authorIds = new ArrayList<>();
             for (Author author : book.getAuthors()) {
-                Long authorId = authorDao.insert(author);
+                Long authorId = authorDao.insert(connection, author);
                 authorIds.add(authorId);
             }
 
@@ -105,60 +105,49 @@ public class BookDao {
      */
     public void update(Book book) {
         DatabaseService.executeTransaction(connection -> {
-            // 1. Update main book fields
-            String sql = """
-            UPDATE books SET
-                title = ?,
-                file_path = ?,
-                description = ?,
-                publisher = ?,
-                isbn = ?
-            WHERE id = ?
-        """;
 
-            try (PreparedStatement ps = connection.prepareStatement(sql)) {
-                ps.setString(1, book.getTitle());
-                ps.setString(2, book.getFilePath());
-                ps.setString(3, book.getDescription());
-                ps.setString(4, book.getPublisher());
-                ps.setString(5, book.getIsbn());
-                ps.setLong(6, book.getId());
+            // 1. Buchdaten
+            updateBookTable(connection, book);
 
-                ps.executeUpdate();
-            }
-
-            // 2. Update authors relation
-            // First, delete old relations
-            String deleteSql = "DELETE FROM book_author WHERE book_id = ?";
-            try (PreparedStatement ps = connection.prepareStatement(deleteSql)) {
+            // 2. Alte Autoren löschen
+            try (PreparedStatement ps = connection.prepareStatement(
+                    "DELETE FROM book_author WHERE book_id = ?")) {
                 ps.setLong(1, book.getId());
                 ps.executeUpdate();
             }
 
-            // Then insert updated authors (create new authors if needed)
-            List<Long> authorIds = new ArrayList<>();
+            // 3. Neue Autoren setzen
             for (Author author : book.getAuthors()) {
-                Long authorId = author.getId() != null ? author.getId() : authorDao.insert(author);
-                authorIds.add(authorId);
-            }
-
-            if (!authorIds.isEmpty()) {
-                String insertSql = "INSERT INTO book_author (book_id, author_id) VALUES (?, ?)";
-                try (PreparedStatement ps = connection.prepareStatement(insertSql)) {
-                    for (Long authorId : authorIds) {
-                        ps.setLong(1, book.getId());
-                        ps.setLong(2, authorId);
-                        ps.addBatch();
-                    }
-                    ps.executeBatch();
+                Long authorId = authorDao.insert(connection, author);
+                try (PreparedStatement ps = connection.prepareStatement(
+                        "INSERT INTO book_author(book_id, author_id) VALUES (?, ?)")) {
+                    ps.setLong(1, book.getId());
+                    ps.setLong(2, authorId);
+                    ps.executeUpdate();
                 }
             }
 
-            // 3. Optionally: update genres via GenreDao if your schema allows it
-            genreDao.updateBookGenres(book, connection); // optional
+            // 4. Genres
+            genreDao.updateBookGenres(book, connection);
         });
     }
 
+    private void updateBookTable(Connection connection, Book book) throws SQLException {
+        String sql = """
+        UPDATE books
+        SET title = ?, description = ?, publisher = ?, isbn = ?
+        WHERE id = ?
+        """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, book.getTitle());
+            ps.setString(2, book.getDescription());
+            ps.setString(3, book.getPublisher());
+            ps.setString(4, book.getIsbn());
+            ps.setLong(5, book.getId());
+            ps.executeUpdate();
+        }
+    }
 
     private Book mapResultSetToBook(ResultSet rs) throws SQLException {
         Long bookId = rs.getLong("id");
