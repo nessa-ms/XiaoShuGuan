@@ -173,7 +173,17 @@ public class BookDetailsDialog extends Dialog<Void> {
                 grid.getChildren().remove(progress);
 
                 Alert error = new Alert(Alert.AlertType.ERROR);
+
+                // Add Icon to error popup
+                Stage confirmationStage = (Stage) error.getDialogPane().getScene().getWindow();
+                confirmationStage.getIcons().add(icon);
+
                 error.setTitle("Fehler");
+                // Add Stylesheet to error
+                error.getDialogPane().getStylesheets().add(
+                        getClass().getResource("/styles/cherry-blossom.css").toExternalForm()
+                );
+
                 error.setHeaderText("Goodreads konnte nicht geladen werden");
                 error.setContentText(loadGenresTask.getException().getMessage());
                 error.showAndWait();
