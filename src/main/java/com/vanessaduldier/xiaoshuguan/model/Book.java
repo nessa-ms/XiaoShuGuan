@@ -14,6 +14,8 @@ public class Book {
     private List<String> genres;
     private String goodreadsLink;
 
+    private String notes;
+
     private String description;
     private String publisher;
     private String isbn;
@@ -130,6 +132,20 @@ public class Book {
             this.description = "No description available"; // default value to avoid NullPointerException
         }
         this.description = description.replaceAll("\\s+", " ").trim();
+    }
+
+    public String getNotes() {
+        if (notes == null || notes.isEmpty()) {
+            return "No notes available";
+        } return notes.replaceAll("\\s+", " ").trim();
+    }
+
+    public void setNotes(String notes) {
+        if (notes == null || notes.isEmpty()) {
+            this.notes = "No notes available";
+        } else {
+            this.notes = notes.replaceAll("\\s+", " ").trim();
+        }
     }
 
     public String getPublisher() {

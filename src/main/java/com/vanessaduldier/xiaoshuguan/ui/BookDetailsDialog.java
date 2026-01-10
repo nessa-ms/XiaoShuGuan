@@ -42,10 +42,12 @@ public class BookDetailsDialog extends Dialog<Void> {
         grid.setVgap(10);
         grid.setPrefWidth(400);
 
+        // TITLE
         grid.add(new Label("Titel:"), 0, 0);
         TextField titleField = new TextField(book.getTitle());
         grid.add(titleField, 1, 0);
 
+        // AUTHORS
         grid.add(new Label("Autoren:"), 0, 1);
         TextField authorsField = new TextField(
                 book.getAuthors().stream()
@@ -54,12 +56,14 @@ public class BookDetailsDialog extends Dialog<Void> {
         );
         grid.add(authorsField, 1, 1);
 
+        // GENRES
         grid.add(new Label("Genres:"), 0, 2);
         TextField genresField = new TextField(
                 String.join(", ", book.getGenres())
         );
         grid.add(genresField, 1, 2);
 
+        // DESCRIPTION
         Label descriptionLabel = new Label("Beschreibung:");
         grid.add(descriptionLabel, 0, 3);
 
@@ -71,6 +75,19 @@ public class BookDetailsDialog extends Dialog<Void> {
         grid.add(descriptionArea, 0, 4);
         GridPane.setColumnSpan(descriptionArea, 2);
         GridPane.setHgrow(descriptionArea, Priority.ALWAYS);
+
+        // NOTES
+        Label notesLabel = new Label("Notizen:");
+        grid.add(notesLabel, 0, 5);
+
+        TextArea notesArea = new TextArea(book.getNotes());
+        notesArea.setWrapText(true);
+        notesArea.setEditable(true);
+        notesArea.setPrefRowCount(6);
+
+        grid.add(notesArea, 0, 6);
+        GridPane.setColumnSpan(notesArea, 2);
+        GridPane.setHgrow(notesArea, Priority.ALWAYS);
 
         // Buttons
         ButtonType saveButton = new ButtonType("Speichern", ButtonBar.ButtonData.OK_DONE);
@@ -108,6 +125,9 @@ public class BookDetailsDialog extends Dialog<Void> {
                         .filter(s -> !s.isEmpty())
                         .collect(Collectors.toList());
                 book.setGenres(updatedGenres);
+                // NOTES
+                book.setNotes(notesArea.getText());
+
                 bookDao.update(book);
             } else {
                 // X (cancel)

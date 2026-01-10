@@ -101,6 +101,36 @@ public class BookDao {
     }
 
     /**
+     * Delete Book from database
+     * @param book Book
+     */
+    public void delete(Book book) {
+        DatabaseService.executeTransaction(connection -> {
+
+            // remove relations
+            try (PreparedStatement ps = connection.prepareStatement(
+                    "DELETE FROM book_author WHERE book_id = ?")) {
+                ps.setLong(1, book.getId());
+                ps.executeUpdate();
+            }
+
+            try (PreparedStatement ps = connection.prepareStatement(
+                    "DELETE FROM book_genre WHERE book_id = ?")) {
+                ps.setLong(1, book.getId());
+                ps.executeUpdate();
+            }
+
+            // delete book
+            try (PreparedStatement ps = connection.prepareStatement(
+                    "DELETE FROM books WHERE id = ?")) {
+                ps.setLong(1, book.getId());
+                ps.executeUpdate();
+            }
+        });
+    }
+
+
+    /**
      * Update an existing Book in the Database
      */
     public void update(Book book) {

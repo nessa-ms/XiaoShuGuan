@@ -39,6 +39,7 @@ public class DatabaseService {
                 author_id INTEGER,
                 file_path TEXT UNIQUE NOT NULL,
                 description TEXT,
+                notes TEXT,
                 publisher TEXT,
                 isbn TEXT,
                 added_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

@@ -37,6 +37,19 @@ public class FileStorageService {
         return targetPath.toFile();
     }
 
+    /**
+     * Delete Epub file from library folder
+     * @param book Book
+     */
+    public void deleteEpub(Book book) {
+        if (book.getFilePath() != null) {
+            File file = new File(book.getFilePath());
+            if (file.exists()) {
+                file.delete();
+            }
+        }
+    }
+
     private String createSafeFileName(Book book) {
 
         String title = book.getTitle().replaceAll("[^a-zA-Z0-9äöüÄÖÜß\\s-]", "");
@@ -57,5 +70,26 @@ public class FileStorageService {
             return null;
         }
         return new File(book.getFilePath());
+    }
+
+    /**
+     * exports an Epub file to an Ereader given the book and device root (path)
+     * @param book Book
+     * @param deviceRoot Filepath
+     * @throws IOException if the epub file cant be found
+     */
+    public void exportEpubToEreader(Book book, File deviceRoot) throws IOException {
+        File epub = getEpubFile(book);
+        if (epub == null || !epub.exists()) {
+            throw new IOException("EPUB file not found");
+        }
+
+        File targetDir = new File(deviceRoot, "documents");
+        if (!targetDir.exists()) {
+            targetDir = deviceRoot; // fallback
+        }
+
+        Path targetPath = targetDir.toPath().resolve(epub.getName());
+        Files.copy(epub.toPath(), targetPath, StandardCopyOption.REPLACE_EXISTING);
     }
 }
