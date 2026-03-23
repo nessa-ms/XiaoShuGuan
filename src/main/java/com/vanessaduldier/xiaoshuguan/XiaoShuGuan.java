@@ -220,7 +220,10 @@ public class XiaoShuGuan extends Application {
     }
 
     private void showBookDetails(Book book) {
-        BookDetailsDialog dialog = new BookDetailsDialog(book);
+        BookDetailsDialog dialog = new BookDetailsDialog(book, () -> {
+            refreshBooks();
+            statusLabel.setText("Buch gelöscht: " + book.getTitle());
+        });
         dialog.showAndWait();
         refreshBooks();
     }

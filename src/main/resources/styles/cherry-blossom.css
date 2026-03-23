@@ -31,6 +31,31 @@
     -fx-text-fill: #880E4F;
 }
 
+/* Danger/Delete Button */
+.button.danger-button {
+    -fx-background-color: #FFCDD2;  /* Soft red matching cherry blossom theme */
+    -fx-text-fill: #C62828;
+    -fx-background-radius: 12;
+}
+
+.button.danger-button:hover {
+    -fx-background-color: #EF9A9A;
+    -fx-text-fill: #B71C1C;
+}
+
+/* Dialog-specific button sizing */
+.dialog-pane .button {
+    -fx-padding: 6 16 6 16;
+    -fx-font-size: 12px;
+    -fx-min-width: 80px;
+}
+
+/* Make action buttons slightly more prominent */
+.dialog-pane .button:default {
+    -fx-background-color: #F48FB1;
+    -fx-font-weight: bold;
+}
+
 /* Table */
 .table-view {
     -fx-focus-color: transparent;

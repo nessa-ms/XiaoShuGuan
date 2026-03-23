@@ -41,12 +41,25 @@ public class FileStorageService {
      * Delete Epub file from library folder
      * @param book Book
      */
-    public void deleteEpub(Book book) {
-        if (book.getFilePath() != null) {
-            File file = new File(book.getFilePath());
-            if (file.exists()) {
-                file.delete();
+    public void deleteEpub(Book book) throws IOException {
+        if (book == null || book.getFilePath() == null) {
+            return;
+        }
+
+        File file = new File(book.getFilePath());
+        if (!file.exists()) {
+            System.err.println("Warnung: EPUB-Datei nicht gefunden: " + book.getFilePath());
+            return;
+        }
+
+        try {
+            boolean deleted = file.delete();
+            if (!deleted) {
+                throw new IOException("Datei konnte nicht gelöscht werden da sie möglicherweise in Benutzung ist");
             }
+            System.out.println("EPUB gelöscht: " + file.getAbsolutePath());
+        } catch (SecurityException e) {
+            throw new IOException("Keine Berechtigung zum Löschen: " + e.getMessage(), e);
         }
     }
 
