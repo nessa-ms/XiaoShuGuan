@@ -166,9 +166,9 @@ public class Book {
 
     public String getGoodreadsLink() {
         if (goodreadsLink == null || goodreadsLink.isEmpty()) {
-            return goodreadsLink;
+            return "no link has been added";
         }
-        return "no link has been added";
+        return goodreadsLink;
     }
 
     public void setGoodreadsLink(String goodreadsLink) {
