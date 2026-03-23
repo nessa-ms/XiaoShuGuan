@@ -16,7 +16,7 @@ public class DatabaseService {
         initializeDatabase();
     }
 
-    private DatabaseService() {}
+    public DatabaseService() {}
 
     /**
      * Create Database

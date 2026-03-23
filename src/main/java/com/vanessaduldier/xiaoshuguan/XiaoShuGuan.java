@@ -4,6 +4,8 @@ import com.vanessaduldier.xiaoshuguan.dao.BookDao;
 import com.vanessaduldier.xiaoshuguan.model.Book;
 import com.vanessaduldier.xiaoshuguan.service.BookImportService;
 
+import com.vanessaduldier.xiaoshuguan.service.CleanupService;
+import com.vanessaduldier.xiaoshuguan.service.DatabaseService;
 import com.vanessaduldier.xiaoshuguan.ui.BookDetailsDialog;
 import javafx.application.Application;
 import javafx.beans.property.SimpleStringProperty;
@@ -21,6 +23,8 @@ import javafx.collections.FXCollections;
 import javafx.scene.layout.HBox;
 
 import java.io.File;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,16 +35,24 @@ import java.util.stream.Collectors;
 public class XiaoShuGuan extends Application {
 
     private BookImportService importService;
+    private CleanupService cleanupService;
     private BookDao bookDao;
     private Label statusLabel;
     private TableView<Book> bookTable;
     private TextField searchField;
+    private Connection connection;
 
     @Override
     public void start(Stage primaryStage) {
         // initialize services
         importService = new BookImportService();
+        cleanupService = new CleanupService();
         bookDao = new BookDao();
+        try {
+            connection = DatabaseService.getConnection();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
 
         // Load Icon
         primaryStage.getIcons().add(
@@ -183,6 +195,7 @@ public class XiaoShuGuan extends Application {
             List<Book> books = bookDao.findAll();
             bookTable.setItems(FXCollections.observableArrayList(books));
             statusLabel.setText("Geladen: " + books.size() + " Bücher");
+            cleanupService.cleanupOrphans(connection);
         } catch (Exception e) {
             statusLabel.setText("Fehler beim Laden: " + e.getMessage());
             e.printStackTrace();
