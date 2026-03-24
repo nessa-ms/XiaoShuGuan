@@ -36,14 +36,14 @@ public class DatabaseService {
             CREATE TABLE IF NOT EXISTS books (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 title TEXT NOT NULL,
-                author_id INTEGER,
                 file_path TEXT UNIQUE NOT NULL,
                 description TEXT,
                 notes TEXT,
+                status TEXT CHECK (status IN ('read', 'reading', 'not read', 'DNF')) DEFAULT 'not read',
+                rating INTEGER CHECK (rating >= 1 AND rating <= 5),
                 publisher TEXT,
                 isbn TEXT,
-                added_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (author_id) REFERENCES author(id)
+                added_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
             
             CREATE TABLE IF NOT EXISTS genre (
@@ -62,7 +62,9 @@ public class DatabaseService {
             CREATE TABLE IF NOT EXISTS book_genre (
                 book_id INTEGER,
                 genre_id INTEGER,
-                PRIMARY KEY (book_id, genre_id)
+                PRIMARY KEY (book_id, genre_id),
+                FOREIGN KEY (book_id) REFERENCES books(id),
+                FOREIGN KEY (genre_id) REFERENCES genre(id)
             );
 
             CREATE INDEX IF NOT EXISTS idx_books_title ON books(title);

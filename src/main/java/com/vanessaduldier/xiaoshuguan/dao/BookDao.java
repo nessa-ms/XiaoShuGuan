@@ -35,19 +35,20 @@ public class BookDao {
             // save book
             String sql = """
                 INSERT INTO books (
-                    title, author_id, file_path, 
-                    description, publisher, isbn
-                ) VALUES (?, ?, ?, ?, ?, ?)
+                    title, file_path, description, notes, status, rating, publisher, isbn
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """;
 
             Long bookId;
             try (PreparedStatement ps = connection.prepareStatement(sql)) {
                 ps.setString(1, book.getTitle());
-                ps.setLong(2, authorIds.isEmpty() ? 1L : authorIds.get(0));
-                ps.setString(3, book.getFilePath());
-                ps.setString(4, book.getDescription());
-                ps.setString(5, book.getPublisher());
-                ps.setString(6, book.getIsbn());
+                ps.setString(2, book.getFilePath());
+                ps.setString(3, book.getDescription());
+                ps.setString(4, book.getNotes());
+                ps.setString(5, book.getStatus() != null ? book.getStatus() : "not read");
+                ps.setObject(6, book.getRating()); // setObject handles null
+                ps.setString(7, book.getPublisher());
+                ps.setString(8, book.getIsbn());
 
                 ps.executeUpdate();
 
@@ -164,18 +165,20 @@ public class BookDao {
 
     private void updateBookTable(Connection connection, Book book) throws SQLException {
         String sql = """
-        UPDATE books
-        SET title = ?, description = ?, publisher = ?, isbn = ?
-        WHERE id = ?
-        """;
+            UPDATE books
+            SET title = ?, description = ?, notes = ?, status = ?, rating = ?, publisher = ?, isbn = ?
+            WHERE id = ?
+            """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, book.getTitle());
             ps.setString(2, book.getDescription());
-            ps.setString(3, book.getPublisher());
-            ps.setString(4, book.getIsbn());
-            ps.setLong(5, book.getId());
-            ps.executeUpdate();
+            ps.setString(3, book.getNotes());
+            ps.setString(4, book.getStatus() != null ? book.getStatus() : "not read");
+            ps.setObject(5, book.getRating());
+            ps.setString(6, book.getPublisher());
+            ps.setString(7, book.getIsbn());
+            ps.setLong(8, book.getId());
         }
     }
 
@@ -198,6 +201,9 @@ public class BookDao {
         book.setPublisher(rs.getString("publisher"));
         book.setIsbn(rs.getString("isbn"));
         book.setFilePath(rs.getString("file_path"));
+        book.setNotes(rs.getString("notes"));
+        book.setStatus(rs.getString("status"));
+        book.setRating(rs.getObject("rating") != null ? rs.getFloat("rating") : null);
 
         // genres mit GoodreadsService und GenreDao
         List<String> genres = genreDao.findGenresForBook(bookId);

@@ -15,6 +15,8 @@ public class Book {
     private String goodreadsLink;
 
     private String notes;
+    private String status;
+    private Float rating;
 
     private String description;
     private String publisher;
@@ -81,6 +83,7 @@ public class Book {
         this.publishedDate = original.publishedDate;
     }
 
+    // GETTER UND SETTER
     public Long getId() {
         return id;
     }
@@ -214,6 +217,23 @@ public class Book {
     public void setPublishedDate(String publishedDate) {
         this.publishedDate = publishedDate;
     }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Float getRating() {
+        return rating;
+    }
+
+    public void setRating(Float rating) {
+        this.rating = rating;
+    }
+
 
     @Override
     public String toString() {
