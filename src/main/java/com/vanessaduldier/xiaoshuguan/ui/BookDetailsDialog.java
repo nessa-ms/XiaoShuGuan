@@ -7,10 +7,13 @@ import com.vanessaduldier.xiaoshuguan.service.FileStorageService;
 import com.vanessaduldier.xiaoshuguan.service.GoodreadsService;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 
@@ -26,11 +29,15 @@ public class BookDetailsDialog extends Dialog<Void> {
 
     private final Runnable onDeleteCallback;
 
+    private ToggleButton[] heartButtons = new ToggleButton[5];
+    private Float currentRating = null;
 
     public BookDetailsDialog(Book book, Runnable onDeleteCallback) {
         this.onDeleteCallback = onDeleteCallback;
 
         Book original = book.copy();
+
+        this.currentRating = book.getRating() != null ? book.getRating() : null;
 
         // add stylesheet
         getDialogPane().getStylesheets().add(
@@ -48,6 +55,7 @@ public class BookDetailsDialog extends Dialog<Void> {
         grid.setHgap(10);
         grid.setVgap(10);
         grid.setPrefWidth(400);
+        grid.setPadding(new Insets(10));
 
         // Book Details Window Width
         getDialogPane().setPrefWidth(450);
@@ -73,29 +81,43 @@ public class BookDetailsDialog extends Dialog<Void> {
         );
         grid.add(genresField, 1, 2);
 
+        // STATUS
+        grid.add(new Label("Status:"), 0, 3);
+        ComboBox<String> statusCombo = new ComboBox<>();
+        statusCombo.getItems().addAll("not read", "reading", "read", "DNF");
+        statusCombo.setValue(book.getStatus() != null ? book.getStatus() : "not read");
+        statusCombo.setMaxWidth(Double.MAX_VALUE);
+        grid.add(statusCombo, 1, 3);
+
+        // RATING
+        grid.add(new Label("Bewertung:"), 0, 4);
+        HBox heartsBox = createHeartRating(book.getRating());
+        grid.add(heartsBox, 1, 4);
+
         // DESCRIPTION
         Label descriptionLabel = new Label("Beschreibung:");
-        grid.add(descriptionLabel, 0, 3);
+        grid.add(descriptionLabel, 0, 5);
 
         TextArea descriptionArea = new TextArea(book.getDescription());
         descriptionArea.setWrapText(true);
         descriptionArea.setEditable(false);
         descriptionArea.setPrefRowCount(6);
 
-        grid.add(descriptionArea, 0, 4);
+        grid.add(descriptionArea, 0, 6);
         GridPane.setColumnSpan(descriptionArea, 2);
         GridPane.setHgrow(descriptionArea, Priority.ALWAYS);
 
         // NOTES
         Label notesLabel = new Label("Notizen:");
-        grid.add(notesLabel, 0, 5);
+        grid.add(notesLabel, 0, 7);
 
         TextArea notesArea = new TextArea(book.getNotes());
         notesArea.setWrapText(true);
         notesArea.setEditable(true);
         notesArea.setPrefRowCount(6);
+        notesArea.setPromptText("Deine persönlichen Notizen zu diesem Buch...");
 
-        grid.add(notesArea, 0, 6);
+        grid.add(notesArea, 0, 8);
         GridPane.setColumnSpan(notesArea, 2);
         GridPane.setHgrow(notesArea, Priority.ALWAYS);
 
@@ -150,8 +172,16 @@ public class BookDetailsDialog extends Dialog<Void> {
                         .filter(s -> !s.isEmpty())
                         .collect(Collectors.toList());
                 book.setGenres(updatedGenres);
+
+                // STATUS
+                book.setStatus(statusCombo.getValue());
+
+                // RATING
+                book.setRating(currentRating != null ? currentRating : null);
+
                 // NOTES
-                book.setNotes(notesArea.getText());
+                String notesText = notesArea.getText().trim();
+                book.setNotes(notesText.isEmpty() ? null : notesText);
 
                 bookDao.update(book);
             } else {
@@ -160,6 +190,54 @@ public class BookDetailsDialog extends Dialog<Void> {
             }
             return null;
         });
+    }
+
+
+    /**
+     * Creates 5 heart toggle buttons for rating
+     * Clicking heart N fills hearts 1-N and sets rating to N
+     * Styles are now defined in CSS (heart-button, heart-clear-button)
+     */
+    private HBox createHeartRating(Float existingRating) {
+        HBox heartsBox = new HBox(5);
+        heartsBox.setAlignment(Pos.CENTER_LEFT);
+
+        int filledHearts = existingRating != null ? Math.round(existingRating) : 0;
+
+        for (int i = 0; i < 5; i++) {
+            final float heartValue = i + 1;
+
+            ToggleButton heart = new ToggleButton("♥");
+            heart.getStyleClass().add("heart-button");
+            heart.setSelected(heartValue <= filledHearts);
+
+            heart.setOnAction(e -> {
+                if (heart.isSelected()) {
+                    // click to fill all hearts up to this one
+                    currentRating = heartValue;
+                    updateHearts(heartValue);
+                } else {
+                    // click filled to unselect
+                    if (heartValue == currentRating) {
+                        currentRating = null;
+                        updateHearts(0);
+                    } else {
+                        heart.setSelected(true);
+                    }
+                }
+            });
+
+            heartButtons[i] = heart;
+            heartsBox.getChildren().add(heart);
+        }
+        return heartsBox;
+    }
+
+    private void updateHearts(float filledCount) {
+        for (int i = 0; i < 5; i++) {
+            boolean filled = i < filledCount;
+            heartButtons[i].setSelected(filled);
+        }
     }
 
     private boolean showDeleteConfirmation(Book book) {

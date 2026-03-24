@@ -138,9 +138,10 @@ public class Book {
     }
 
     public String getNotes() {
-        if (notes == null || notes.isEmpty()) {
-            return "No notes available";
-        } return notes.replaceAll("\\s+", " ").trim();
+        if (notes == null || notes.isEmpty() || notes.equals("No notes available")) {
+            return "";
+        }
+        return notes.replaceAll("\\s+", " ").trim();
     }
 
     public void setNotes(String notes) {

@@ -25,36 +25,32 @@
     -fx-background-radius: 12;
     -fx-padding: 5 14 3 14;
 }
-
 .button:hover {
     -fx-background-color: #FCE4EC;
     -fx-text-fill: #880E4F;
 }
-
 /* Danger/Delete Button */
 .button.danger-button {
     -fx-background-color: #FFCDD2;  /* Soft red matching cherry blossom theme */
     -fx-text-fill: #C62828;
     -fx-background-radius: 12;
 }
-
 .button.danger-button:hover {
     -fx-background-color: #EF9A9A;
     -fx-text-fill: #B71C1C;
 }
-
 /* Dialog-specific button sizing */
 .dialog-pane .button {
     -fx-padding: 6 16 6 16;
     -fx-font-size: 12px;
     -fx-min-width: 80px;
 }
-
 /* Make action buttons slightly more prominent */
 .dialog-pane .button:default {
     -fx-background-color: #F48FB1;
     -fx-font-weight: bold;
 }
+
 
 /* Table */
 .table-view {
@@ -68,42 +64,33 @@
 .table-view .table-cell {
     -fx-border-color: transparent;
 }
-
 .table-view .column-header-background {
     -fx-background-color: #FCE4EC;
     -fx-background-radius: 14 14 0 0;
 }
-
 .table-view .column-header {
     -fx-background-color: transparent;
     -fx-border-color: transparent;
 }
-
 .table-view .column-header .label {
     -fx-text-fill: #880E4F;
     -fx-font-weight: bold;
 }
-
 .table-row-cell:selected {
     -fx-background-color: #F8BBD0;
 }
-
 .table-row-cell {
     -fx-background-color: white;
 }
-
 .table-row-cell:odd {
     -fx-background-color: #FFF7FB;
 }
-
 .table-row-cell:selected {
     -fx-background-color: #F8BBD0;
 }
-
 .table-row-cell:selected .text {
     -fx-fill: #880E4F;
 }
-
 .table-row-cell:hover {
     -fx-background-color: #FCE4EC;
 }
@@ -113,8 +100,85 @@
 .scroll-bar:horizontal {
     -fx-background-color: transparent;
 }
-
 .scroll-bar .thumb {
     -fx-background-color: #F8BBD0;
     -fx-background-radius: 8;
+}
+
+/* STATUS DROPDOWN */
+.combo-box,
+.combo-box-popup .list-view {
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+}
+.combo-box {
+    -fx-background-color: #FFE4F0;
+    -fx-border-color: transparent;
+}
+.combo-box .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #880E4F;
+}
+.combo-box-popup .list-view {
+    -fx-background-color: #FFF4FA;
+    -fx-border-color: #F8BBD0;
+}
+.combo-box-popup .list-cell:hover {
+    -fx-background-color: #FCE4EC;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+}
+.combo-box-popup .list-cell:selected {
+    -fx-background-color: #F8BBD0;
+    -fx-text-fill: #880E4F;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+}
+
+/* RATING HEART BUTTONS */
+.heart-button {
+    -fx-min-size: 32px;
+    -fx-max-size: 32px;
+    -fx-pref-size: 32px;
+    -fx-font-size: 18px;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+/* Empty heart */
+.heart-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #CCC;
+}
+/* Filled heart */
+.heart-button:selected {
+    -fx-background-color: transparent;
+    -fx-text-fill: #ec5392;
+}
+/* Hover effect for empty and filled heart */
+.heart-button:hover,
+.heart-button:selected:hover {
+    -fx-border-color: transparent;
+    -fx-text-fill: #F8BBD0;
+    -fx-cursor: hand;
+}
+
+/* TextArea styling */
+.text-area,
+.text-area .scroll-pane,
+.text-area .viewport,
+.text-area .content,
+.text-area .scroll-pane .viewport,
+.text-area .scroll-pane .content,
+.text-area:focused {
+    -fx-background-color: white;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+}
+.text-area {
+    -fx-border-color: #F8BBD0;
+}
+.text-area:focused {
+    -fx-border-color: #F48FB1;
 }

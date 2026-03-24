@@ -179,6 +179,8 @@ public class BookDao {
             ps.setString(6, book.getPublisher());
             ps.setString(7, book.getIsbn());
             ps.setLong(8, book.getId());
+
+            ps.executeUpdate();
         }
     }
 
