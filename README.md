@@ -11,10 +11,21 @@ Sort your books by various categories such as title, author, genre etc. (not yet
 Use XiaoShuGuan to load books into your kobo or tolino ereader via USB connection. (not yet implemented) <br>
 
 ### Preview
-![alt text](preview/Screenshot%202026-01-06%20193239.png)
-![alt text](preview/img.png)
-![alt text](preview/Screenshot%202026-01-06%20193307.png)
-![alt text](preview/Screenshot%202026-01-06%20193333.png)
+<div align="center">
+  <img width="84%" src="preview/Screenshot%202026-01-06%20193239.png" alt="Sample image">
+</div>
+
+<div align="center" style="display: flex; justify-content: center; gap: 20px; margin-top: 20px;">
+  <div style="width: 40%;">
+    <img width="100%" src="preview/img.png" alt="Sample image">
+  </div>
+  <div style="width: 40%; display: flex; flex-direction: column; gap: 10px;">
+    <img width="100%" src="preview/Screenshot%202026-01-06%20193307.png" alt="Sample image">
+    <img width="100%" src="preview/Screenshot%202026-01-06%20193333.png" alt="Sample image">
+  </div>
+</div>
+
+
 
 ### Installation
 
