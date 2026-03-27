@@ -1,0 +1,167 @@
+@startuml XiaoShuGuan Architecture
+
+!define CHERRY_PINK #F8BBD0
+!define CHERRY_LIGHT #FCE4EC
+!define CHERRY_DARK #C2185B
+!define CHERRY_BG #FFF4FA
+
+skinparam backgroundColor CHERRY_BG
+skinparam class {
+    BackgroundColor white
+    BorderColor CHERRY_PINK
+    ArrowColor CHERRY_DARK
+    FontColor #333
+}
+
+skinparam stereotype {
+    CBackgroundColor CHERRY_PINK
+    CBorderColor CHERRY_DARK
+    CFontColor white
+}
+
+' ===== UI =====
+class "«JavaFX Application»\nXiaoShuGuan" as XiaoShuGuan {
+    +start(Stage): void
+    -importEpubFile(Stage): void
+    -refreshBooks(): void
+    -searchBooks(): void
+    -showBookDetails(Book): void
+}
+
+class "«Dialog»\nBookDetailsDialog" as BookDetailsDialog {
+    -heartButtons: ToggleButton[5]
+    -currentRating: Float
+    +BookDetailsDialog(Book, Runnable)
+    -createHeartRating(Float): HBox
+    -updateHearts(float): void
+    -showDeleteConfirmation(Book): boolean
+    -performDelete(Book): void
+    -openGoodreadsDialog(...): void
+}
+
+' ===== MODEL =====
+class "«Entity»\nBook" as Book {
+    -id: Long
+    -title: String
+    -authors: List<Author>
+    -genres: List<String>
+    -notes: String
+    -status: String
+    -rating: Float
+    -description: String
+    -publisher: String
+    -isbn: String
+    -filePath: String
+    --
+    +copy(): Book
+    +restore(Book): void
+    +getAuthorName(): String
+}
+
+class "«Entity»\nAuthor" as Author {
+    -id: Long
+    -name: String
+}
+
+' ===== DAO LAYER =====
+class "«DAO»\nBookDao" as BookDao {
+    +insert(Book): Long
+    +findAll(): List<Book>
+    +delete(Book): void
+    +update(Book): void
+    -updateBookTable(Connection, Book): void
+    -mapResultSetToBook(ResultSet): Book
+    -loadAuthors(Long): List<Author>
+}
+
+class "«DAO»\nAuthorDao" as AuthorDao {
+    +insert(Connection, Author): Long
+    +findAuthorId(String): Long
+    +findAuthor(Long): Author
+}
+
+class "«DAO»\nGenreDao" as GenreDao {
+    +saveGenresForBook(Long, List<String>): void
+    +findGenresForBook(Long): List<String>
+    +updateBookGenres(Book, Connection): void
+}
+
+' ===== SERVICE =====
+class "«Service»\nDatabaseService" as DatabaseService {
+    -DB_URL: String
+    +{static} initializeDatabase(): void
+    +{static} getConnection(): Connection
+    +{static} executeTransaction(...): void
+    +{static} executeTransactionWithResult<T>(...): T
+}
+
+class "«Service»\nBookImportService" as BookImportService {
+    +importEpub(File): Book
+}
+
+class "«Service»\nFileStorageService" as FileStorageService {
+    +storeEpub(File, Book): File
+    +deleteEpub(Book): void
+    +getEpubFile(Book): File
+    +exportEpubToEreader(Book, File): void
+}
+
+class "«Service»\nGoodreadsService" as GoodreadsService {
+    +fetchGenres(String): List<String>
+    +readFromWeb(String): void
+}
+
+class "«Service»\nCleanupService" as CleanupService {
+    +cleanupOrphans(Connection): void
+}
+
+class "«Service»\nTolinoService" as TolinoService {
+    -pathToEreader: String
+    +importBook(Book): void
+}
+
+' ===== PARSER =====
+class "«Parser»\nEpubParser" as EpubParser {
+    +parse(File): Book
+    -extractTitle(...): String
+    -extractAuthors(...): List<Author>
+    -extractGenres(...): List<String>
+    -extractDescription(...): String
+    -extractPublisher(...): String
+    -extractISBN(...): String
+    -extractLanguage(...): String
+    -extractCoverImage(...): String
+}
+
+' ===== RELATIONSHIPS =====
+XiaoShuGuan --> BookImportService : uses >
+XiaoShuGuan --> CleanupService : uses >
+XiaoShuGuan --> BookDao : uses >
+XiaoShuGuan ..> BookDetailsDialog : creates >
+
+BookDetailsDialog --> GoodreadsService : uses >
+BookDetailsDialog --> FileStorageService : uses >
+BookDetailsDialog --> BookDao : uses >
+BookDetailsDialog ..> Book : manages >
+
+Book --> Author : contains * >
+Book --> "0..1" Float : rating >
+
+BookDao --> AuthorDao : uses >
+BookDao --> GenreDao : uses >
+BookDao ..> DatabaseService : uses >
+
+BookImportService --> EpubParser : uses >
+BookImportService --> BookDao : uses >
+BookImportService --> FileStorageService : uses >
+
+TolinoService --> FileStorageService : uses >
+
+legend right
+    **Architecture:**
+    * 3-Layer Architecture
+    * UI → Service → DAO → Database
+    * Model entities shared across layers
+endlegend
+
+@enduml
