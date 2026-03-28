@@ -18,18 +18,21 @@ import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * Book Details Dialog
+ */
 public class BookDetailsDialog extends Dialog<Void> {
     private final GoodreadsService goodreadsService = new GoodreadsService();
     private final FileStorageService fileStorageService = new FileStorageService();
     private final BookDao bookDao = new BookDao();
-    private final Image icon = new Image(getClass().getResourceAsStream("/ui/icon/icon.png"));
+    private final Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/ui/icon/icon.png")));
 
     private final Runnable onDeleteCallback;
 
-    private ToggleButton[] heartButtons = new ToggleButton[5];
+    private final ToggleButton[] heartButtons = new ToggleButton[5];
     private Float currentRating = null;
 
     public BookDetailsDialog(Book book, Runnable onDeleteCallback) {
@@ -240,6 +243,7 @@ public class BookDetailsDialog extends Dialog<Void> {
         }
     }
 
+
     private boolean showDeleteConfirmation(Book book) {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Buch löschen");
@@ -282,6 +286,7 @@ public class BookDetailsDialog extends Dialog<Void> {
                     "Das Buch konnte nicht vollständig gelöscht werden:\n" + e.getMessage());
         }
     }
+
 
     private void showErrorAlert(String title, String content) {
         Alert error = new Alert(Alert.AlertType.ERROR);

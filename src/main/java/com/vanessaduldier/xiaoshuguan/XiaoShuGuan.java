@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * App
+ * Main Table View
  * @author Vanessa Duldier
  */
 public class XiaoShuGuan extends Application {
