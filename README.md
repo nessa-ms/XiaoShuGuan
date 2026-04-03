@@ -4,10 +4,10 @@
 #### Personal Library Desktop Application <br> 
 Manage your personal library by adding books as epub files (or not yet implemented manually). <br>
 Edit the book title, author name, genres and book cover. <br>
-Add your personal notes to a book. (not yet implemented) <br>
-Track your reading progress. (not yet implemented) <br>
+Add your personal notes to a book. <br>
+Track your reading progress. <br>
 Filter your books by various categories such as author, genre (and not yet implemented reading status). <br>
-Sort your books by various categories such as title, author, genre etc. (not yet implemented) <br>
+Sort your books by various categories such as title, author, genre etc. <br>
 Use XiaoShuGuan to load books into your kobo or tolino ereader via USB connection. (not yet implemented) <br>
 
 ### Preview
@@ -37,8 +37,7 @@ Use XiaoShuGuan to load books into your kobo or tolino ereader via USB connectio
 ### Project Progress
 TODO
 Functional
-- implement read status (+ filter)
-- implement personal notes for book
+- implement read status filter
 
 - implement adding a book manually (typing info and how to deal with epub not being available)
 
