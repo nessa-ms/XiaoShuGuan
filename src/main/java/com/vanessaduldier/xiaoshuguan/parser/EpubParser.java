@@ -3,10 +3,13 @@ package com.vanessaduldier.xiaoshuguan.parser;
 import com.vanessaduldier.xiaoshuguan.model.Author;
 import com.vanessaduldier.xiaoshuguan.model.Book;
 import nl.siegmann.epublib.domain.Identifier;
+import nl.siegmann.epublib.domain.Resource;
+import nl.siegmann.epublib.domain.Spine;
 import nl.siegmann.epublib.epub.EpubReader;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +33,7 @@ public class EpubParser {
             String isbn = extractISBN(epub);
             String language = extractLanguage(epub);
             String coverImage = extractCoverImage(epub);
+            int wordCount = extractWordCount(epub);
 
             // Genre extrahieren (wenn in Metadaten vorhanden)
             List<String> genres = extractGenres(epub);
@@ -39,7 +43,8 @@ public class EpubParser {
                     generateId(),
                     title,
                     authors,
-                    genres
+                    genres,
+                    wordCount
             );
 
             // Zusätzliche Metadaten setzen
@@ -152,5 +157,44 @@ public class EpubParser {
             // Cover nicht vorhanden oder nicht lesbar
         }
         return null;
+    }
+
+    private int extractWordCount(nl.siegmann.epublib.domain.Book epub) {
+        int totalWords = 0;
+        Spine spine = epub.getSpine();
+
+        for (int i = 0; i < spine.size(); i++) {
+            Resource resource = spine.getResource(i);
+            try {
+                if (resource == null || resource.getData() == null) {
+                    continue;
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            try {
+                // Convert bytes to text
+                String content = new String(resource.getData(), "UTF-8");
+
+                // Remove HTML tags
+                String textOnly = content.replaceAll("<[^>]*>", " ");
+
+                // Clean up extra whitespace and normalize
+                textOnly = textOnly.replaceAll("\\s+", " ").trim();
+
+                // Count words (split by whitespace)
+                if (!textOnly.isEmpty()) {
+                    String[] words = textOnly.split("\\s+");
+                    totalWords += words.length;
+                }
+
+            } catch (Exception e) {
+                // Log warning but continue with other resources
+                System.err.println("Warning: Could not parse resource " + i + ": " + e.getMessage());
+            }
+        }
+
+        return totalWords;
     }
 }

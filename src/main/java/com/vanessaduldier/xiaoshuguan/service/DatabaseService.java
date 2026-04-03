@@ -43,7 +43,8 @@ public class DatabaseService {
                 rating INTEGER CHECK (rating >= 1 AND rating <= 5),
                 publisher TEXT,
                 isbn TEXT,
-                added_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                added_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                wordcount INTEGER NOT NULL
             );
             
             CREATE TABLE IF NOT EXISTS genre (

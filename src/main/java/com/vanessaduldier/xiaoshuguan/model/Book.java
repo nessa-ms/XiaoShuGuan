@@ -24,14 +24,15 @@ public class Book {
     private String language;
     private String coverImage;
     private String filePath;
-    private Integer pageCount;
+    private Integer wordCount;
     private String publishedDate;
 
-    public Book(Long id, String title, List<Author> authors, List<String> genres) {
+    public Book(Long id, String title, List<Author> authors, List<String> genres, int wordcount) {
         this.id = id;
         this.title = title;
         this.authors = authors != null ? authors : new ArrayList<>();
         this.genres = genres != null ? genres : new ArrayList<>();
+        this.wordCount = wordcount;
     }
 
     /**
@@ -43,7 +44,8 @@ public class Book {
                 this.id,
                 this.title,
                 new ArrayList<>(this.authors),
-                new ArrayList<>(this.genres)
+                new ArrayList<>(this.genres),
+                this.wordCount
         );
 
         copy.setGoodreadsLink(this.goodreadsLink);
@@ -53,7 +55,7 @@ public class Book {
         copy.setLanguage(this.language);
         copy.setCoverImage(this.coverImage);
         copy.setFilePath(this.filePath);
-        copy.setPageCount(this.pageCount);
+        copy.setWordCount(this.wordCount);
         copy.setPublishedDate(this.publishedDate);
 
         return copy;
@@ -79,7 +81,7 @@ public class Book {
         this.language = original.language;
         this.coverImage = original.coverImage;
         this.filePath = original.filePath;
-        this.pageCount = original.pageCount;
+        this.wordCount = original.wordCount;
         this.publishedDate = original.publishedDate;
     }
 
@@ -203,12 +205,12 @@ public class Book {
         this.filePath = filePath;
     }
 
-    public Integer getPageCount() {
-        return pageCount;
+    public Integer getWordCount() {
+        return wordCount;
     }
 
-    public void setPageCount(Integer pageCount) {
-        this.pageCount = pageCount;
+    public void setWordCount(Integer pageCount) {
+        this.wordCount = pageCount;
     }
 
     public String getPublishedDate() {

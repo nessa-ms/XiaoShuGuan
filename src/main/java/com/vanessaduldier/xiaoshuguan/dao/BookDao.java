@@ -35,8 +35,8 @@ public class BookDao {
             // save book
             String sql = """
                 INSERT INTO books (
-                    title, file_path, description, notes, status, rating, publisher, isbn
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    title, file_path, description, notes, status, rating, publisher, isbn, wordcount
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
 
             Long bookId;
@@ -49,6 +49,7 @@ public class BookDao {
                 ps.setObject(6, book.getRating()); // setObject handles null
                 ps.setString(7, book.getPublisher());
                 ps.setString(8, book.getIsbn());
+                ps.setInt(9, book.getWordCount());
 
                 ps.executeUpdate();
 
@@ -166,7 +167,7 @@ public class BookDao {
     private void updateBookTable(Connection connection, Book book) throws SQLException {
         String sql = """
             UPDATE books
-            SET title = ?, description = ?, notes = ?, status = ?, rating = ?, publisher = ?, isbn = ?
+            SET title = ?, description = ?, notes = ?, status = ?, rating = ?, publisher = ?, isbn = ?, wordcount = ?
             WHERE id = ?
             """;
 
@@ -178,7 +179,8 @@ public class BookDao {
             ps.setObject(5, book.getRating());
             ps.setString(6, book.getPublisher());
             ps.setString(7, book.getIsbn());
-            ps.setLong(8, book.getId());
+            ps.setInt(8, book.getWordCount());
+            ps.setLong(9, book.getId());
 
             ps.executeUpdate();
         }
@@ -190,12 +192,13 @@ public class BookDao {
         // Autoren laden
         List<Author> authors = loadAuthors(bookId);
 
-        // Buch mit Basisinformationen erstellen (keine Genres im neuen Schema)
+        // Buch mit Basisinformationen erstellen
         Book book = new Book(
                 bookId,
                 rs.getString("title"),
                 authors,
-                new ArrayList<>() // Keine Genres in vereinfachtem Schema
+                new ArrayList<>(),
+                rs.getInt("wordcount")
         );
 
         // Verfügbare Metadaten setzen
