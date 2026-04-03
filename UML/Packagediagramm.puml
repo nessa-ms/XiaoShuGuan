@@ -1,0 +1,118 @@
+@startuml XiaoShuGuan Package Architecture
+
+!define CHERRY_PINK #F8BBD0
+!define CHERRY_LIGHT #FCE4EC
+!define CHERRY_DARK #C2185B
+!define CHERRY_BG #FFF4FA
+
+skinparam backgroundColor CHERRY_BG
+
+' Package styling
+skinparam package {
+    BackgroundColor CHERRY_LIGHT
+    BorderColor CHERRY_DARK
+    FontColor CHERRY_DARK
+    FontSize 14
+    FontStyle bold
+}
+
+' Class styling
+skinparam class {
+    BackgroundColor white
+    BorderColor CHERRY_PINK
+    ArrowColor CHERRY_DARK
+    FontColor #333
+}
+
+skinparam stereotype {
+    CBackgroundColor CHERRY_PINK
+    CBorderColor CHERRY_DARK
+    CFontColor white
+}
+
+' ===== PACKAGES =====
+
+package "ui" <<UI>> {
+    class "«JavaFX Application»\nXiaoShuGuan" as XiaoShuGuan {
+    }
+
+    class "«Dialog»\nBookDetailsDialog" as BookDetailsDialog {
+    }
+}
+
+package "model" <<Model>> {
+    class "«Entity»\nBook" as Book {
+    }
+
+    class "«Entity»\nAuthor" as Author {
+    }
+}
+
+package "dao" <<DAO>> {
+    class "«DAO»\nBookDao" as BookDao {
+    }
+
+    class "«DAO»\nAuthorDao" as AuthorDao {
+    }
+
+    class "«DAO»\nGenreDao" as GenreDao {
+    }
+}
+
+package "service" <<Service>> {
+    class "«Service»\nDatabaseService" as DatabaseService {
+    }
+
+    class "«Service»\nBookImportService" as BookImportService {
+    }
+
+    class "«Service»\nFileStorageService" as FileStorageService {
+    }
+
+    class "«Service»\nGoodreadsService" as GoodreadsService {
+    }
+
+    class "«Service»\nCleanupService" as CleanupService {
+    }
+
+    class "«Service»\nTolinoService" as TolinoService {
+    }
+}
+
+package "parser" <<Parser>> {
+    class "«Parser»\nEpubParser" as EpubParser {
+    }
+}
+
+' ===== PACKAGE DEPENDENCIES =====
+
+ui ..> model : uses >
+ui ..> dao : uses >
+ui ..> service : uses >
+
+dao ..> model : uses >
+dao ..> service : uses
+
+service ..> model : uses >
+service ..> dao : uses
+service ..> parser : uses >
+
+parser ..> model : uses >
+
+' ===== INTERNAL RELATIONSHIPS =====
+
+
+legend right
+    **Package Architecture:**
+    * UI Layer (JavaFX)
+    * Model Layer (Entities)
+    * DAO Layer (Data Access)
+    * Service Layer (Business Logic)
+    * Parser Layer (File Parsing)
+
+    **Dependencies:**
+    * UI → Service → DAO → Model
+    * Parser → Model
+endlegend
+
+@enduml

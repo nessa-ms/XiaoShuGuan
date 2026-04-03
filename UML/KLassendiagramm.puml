@@ -52,6 +52,7 @@ class "«Entity»\nBook" as Book {
     -publisher: String
     -isbn: String
     -filePath: String
+    -wordCount: int
     --
     +copy(): Book
     +restore(Book): void
@@ -131,6 +132,7 @@ class "«Parser»\nEpubParser" as EpubParser {
     -extractISBN(...): String
     -extractLanguage(...): String
     -extractCoverImage(...): String
+    -extractWordCount(...): int
 }
 
 ' ===== RELATIONSHIPS =====
